@@ -21,4 +21,9 @@ URL: https://github.com/AndreSjuve/texaid
 BugReports: https://github.com/AndreSjuve/texaid/issues
 Imports: 
     fs,
-    magrittr
+    purrr,
+    magrittr,
+    stargazer,
+    stringi,
+    stringr,
+    utils

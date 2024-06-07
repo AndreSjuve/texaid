@@ -135,7 +135,7 @@ ltx_caption <- function(x, tbl_note = "", print_tbl = FALSE) {
 
   if (print_tbl) {
     cat(c("", "", "", x, "", "", ""), sep = "\n")
-    writeClipboard(x)
+    utils::writeClipboard(x)
   }
   invisible(x)
 
@@ -176,7 +176,7 @@ ltx_decimals <- function(x, n_digits = 3, print_tbl = FALSE) {
 
   if (print_tbl) {
     cat(c("", "", "", x, "", "", ""), sep = "\n")
-    writeClipboard(x)
+    utils::writeClipboard(x)
   }
 
   invisible(x)
@@ -241,7 +241,7 @@ ltx_environment <- function(x, print_tbl = FALSE) {
 
   if (print_tbl) {
     cat(c("", "", "", x, "", "", ""), sep = "\n")
-    writeClipboard(x)
+    utils::writeClipboard(x)
   }
   invisible(x)
 }
@@ -296,7 +296,7 @@ ltx_fontsize <- function(x, font_size = 8, print_tbl = FALSE) {
 
   if (print_tbl) {
     cat(c("", "", "", x, "", "", ""), sep = "\n")
-    writeClipboard(x)
+    utils::writeClipboard(x)
   }
 
   invisible(x)
@@ -346,7 +346,7 @@ ltx_multipanel <- function(x, print_tbl = FALSE) {
 
   if (print_tbl) {
     cat(c("", "", "", x, "", "", ""), sep = "\n")
-    writeClipboard(x)
+    utils::writeClipboard(x)
   }
   invisible(x)
 }
@@ -395,7 +395,7 @@ ltx_placement <- function(x, tbl_placement = NULL, print_tbl = FALSE) {
 
   if (print_tbl) {
     cat(c("", "", "", x, "", "", ""), sep = "\n")
-    writeClipboard(x)
+    utils::writeClipboard(x)
   }
 
   invisible(x)
@@ -445,7 +445,7 @@ ltx_resize <- function(x, print_tbl = FALSE) {
 
   if (print_tbl) {
     cat(c("", "", "", x, "", "", ""), sep = "\n")
-    writeClipboard(x)
+    utils::writeClipboard(x)
   }
 
   invisible(x)
