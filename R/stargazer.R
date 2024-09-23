@@ -12,7 +12,6 @@
 #' @param star_tbl Stargazer object
 #'
 #' @return Character vector
-#' @export
 #'
 #' @importFrom stringr str_which
 
@@ -62,7 +61,6 @@ capture_stargazer_tab <- function(star_tbl) {
 #'
 #' @return Prints the latex code to console
 #'
-#' @export
 
 merge_stargazer_tbls <-
   function(tbls,
@@ -158,7 +156,6 @@ merge_stargazer_tbls <-
 #'
 #' @return Latex code for the resized table
 #'
-#' @export
 #'
 #' @importFrom utils capture.output
 #' @importFrom purrr prepend
