@@ -12,6 +12,7 @@ ltx_tidy_table(
   threshold = 10,
   big_dec = 0,
   small_dec = 2,
+  ruler_based = TRUE,
   print_tbl = TRUE
 )
 }

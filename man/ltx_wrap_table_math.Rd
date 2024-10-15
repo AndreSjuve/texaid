@@ -4,11 +4,16 @@
 \alias{ltx_wrap_table_math}
 \title{Wrap Numbers in LaTeX Table in Math Mode within Tabular Environments}
 \usage{
-ltx_wrap_table_math(latex_table, print_tbl = FALSE)
+ltx_wrap_table_math(latex_table, ruler_based = TRUE, print_tbl = FALSE)
 }
 \arguments{
 \item{latex_table}{A character vector or list containing the LaTeX table
 input.}
+
+\item{ruler_based}{A logical value indicating whether the relevant area of
+the table to wrap in math mode is between midrule and bottomrule. Defaults
+to \code{TRUE}. If \code{FALSE} the area of the table wrapped in math mode is between
+the start and end of the tabular environment.}
 
 \item{print_tbl}{A logical value indicating whether to print the table to
 the console after modification. Defaults to \code{FALSE}.}

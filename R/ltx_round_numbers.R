@@ -56,7 +56,8 @@ ltx_round_numbers <- function(latex_table,
   options(digits = 15)
 
   # Function to round numbers in the text
-  round_numbers <- function(x, sdec_limit = small_dec,
+  round_numbers <- function(x,
+                            sdec_limit = small_dec,
                             bdec_limit = big_dec,
                             num_limit = threshold) {
     stringr::str_replace_all(

@@ -18,7 +18,7 @@ test_that("ltx_wrap_table_math works correctly for tabular environments", {
   )
 
   # Test the function
-  result <- ltx_wrap_table_math(latex_input, print_tbl = FALSE)
+  result <- ltx_wrap_table_math(latex_input, ruler_based = FALSE, print_tbl = FALSE)
   expect_equal(result, expected_output)
 })
 
@@ -49,7 +49,7 @@ test_that("ltx_wrap_table_math handles multiple tabular environments", {
   )
 
   # Test the function
-  result <- ltx_wrap_table_math(latex_input, print_tbl = FALSE)
+  result <- ltx_wrap_table_math(latex_input, ruler_based = FALSE, print_tbl = FALSE)
   expect_equal(result, expected_output)
 })
 
@@ -73,6 +73,6 @@ test_that("ltx_wrap_table_math skips already wrapped numbers", {
   )
 
   # Test the function
-  result <- ltx_wrap_table_math(latex_input)
+  result <- ltx_wrap_table_math(latex_input, ruler_based = FALSE)
   expect_equal(result, expected_output)
 })

@@ -49,6 +49,12 @@
 #'
 #' @param latex_table A character vector or list containing the LaTeX table
 #' input.
+#'
+#' @param ruler_based A logical value indicating whether the relevant area of
+#' the table to wrap in math mode is between midrule and bottomrule. Defaults
+#' to `TRUE`. If `FALSE` the area of the table wrapped in math mode is between
+#' the start and end of the tabular environment.
+#'
 #' @param print_tbl A logical value indicating whether to print the table to
 #' the console after modification. Defaults to `FALSE`.
 #'
@@ -75,13 +81,20 @@
 #' # "\\end{tabular}"
 #' }
 #' @export
-ltx_wrap_table_math <- function(latex_table, print_tbl = FALSE) {
+ltx_wrap_table_math <- function(latex_table, ruler_based = TRUE, print_tbl = FALSE) {
   # Capture LaTeX table output
   latex_table <- ltx_capture_output(latex_table)
 
   # Find the indices of tabular environments
-  stbl <- stringr::str_which(latex_table, "\\\\begin\\{(tabular|tabularx)\\}")
-  etbl <- stringr::str_which(latex_table, "\\\\end\\{(tabular|tabularx)\\}")
+
+  if (ruler_based) {
+    stbl <- stringr::str_which(latex_table, "\\\\midrule")[1]
+    etbl <- stringr::str_which(latex_table, "\\\\bottomrule")[1]
+  } else {
+    stbl <- stringr::str_which(latex_table, "\\\\begin\\{(tabular|tabularx)\\}")
+    etbl <- stringr::str_which(latex_table, "\\\\end\\{(tabular|tabularx)\\}")
+  }
+
 
   # Check if tabular environments were found
   if (length(stbl) == 0 || length(etbl) == 0) {
