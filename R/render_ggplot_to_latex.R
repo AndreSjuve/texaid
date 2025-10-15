@@ -109,7 +109,9 @@ render_ggplot_to_latex <- function(
   )
 
   # Collect and inject metadata
-  meta <- collect_output_metadata(output_path = fig_out)
+  suppressWarnings(
+    meta <- collect_output_metadata(output_path = fig_out)
+  )
   write_metadata_block(fig_out, meta, mode = "auto")
 
   figure <- readLines(fig_out)
