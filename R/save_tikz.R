@@ -13,6 +13,7 @@
 #' Defaults to `TRUE`.
 #' @param width Numeric, specifying the width of the figure in inches. Defaults to `6.4`.
 #' @param height Numeric, specifying the height of the figure in inches. Defaults to `3.54`.
+#' @param tikz_scale Numeric, specifying the relative scale of the figure. Defaults to `3.54`.
 #'
 #' @return The path to the saved TikZ file is returned invisibly.
 #'
@@ -42,53 +43,65 @@
 #' }
 #'
 #' @export
-save_tikz <- function(fig = NULL, path = NULL, sanitize = TRUE, width = 6.4, height = 3.54) {
-
-  # Check if fig is NULL
+save_tikz <- function(
+  fig = NULL,
+  path = NULL,
+  sanitize = TRUE,
+  width = 6.4,
+  height = 3.54,
+  tikz_scale = 1
+) {
   if (is.null(fig)) {
     cli::cli_abort("fig is NULL, provide figure to save.")
   }
-
-  # Check if fig is a valid ggplot object
   if (!inherits(fig, "gg")) {
     cli::cli_abort("The provided figure is not a valid ggplot object.")
   }
-
-  # Check if path is NULL
   if (is.null(path)) {
     cli::cli_abort("path is NULL, don't know where to save the figure file.")
   }
 
-  # If the path doesn't include a folder, use the manuscript/content directory as default
   if (fs::path_file(fs::path_ext_remove(path)) == path) {
-    path <- fs::path("manuscript", "content", fs::path_ext_remove(path), ext = "tex")
+    path <- fs::path(
+      "manuscript",
+      "content",
+      fs::path_ext_remove(path),
+      ext = "tex"
+    )
   }
-
-  # If no extension is given, add .tex extension
   if (fs::path_ext(path) == "") {
     cli::cli_alert_info("No file extension given, adding .tex")
     path <- fs::path_ext_set(path, "tex")
   }
-
-  # Ensure the directory exists
   dir_path <- fs::path_dir(path)
   if (!fs::dir_exists(dir_path)) {
     cli::cli_abort(paste0("Directory does not exist: ", dir_path))
   }
 
-  # Start the TikZ device
-  tikzDevice::tikz(file = path, width = width, height = height, sanitize = sanitize, verbose = FALSE)
-
-  # Attempt to print the figure
-  tryCatch({
-    print(fig)
-    grDevices::dev.off()  # Close the device after rendering
-    cli::cli_alert_success("Figure is saved to: {path}")
-  }, error = function(e) {
-    grDevices::dev.off()  # Close the device in case of error
-    cli::cli_abort(paste0("An error occurred while saving the figure: ", e$message))
-  })
-
-  invisible(path)  # Return the path invisibly
+  tikzDevice::tikz(
+    file = path,
+    width = width,
+    height = height,
+    sanitize = sanitize,
+    verbose = FALSE
+  )
+  tryCatch(
+    {
+      print(fig)
+      grDevices::dev.off()
+      # Inject scale into \begin{tikzpicture}[...]
+      if (!is.null(tikz_scale) && is.finite(tikz_scale) && tikz_scale != 1) {
+        tikz_inject_scale(path, tikz_scale)
+      }
+      cli::cli_alert_success("Figure is saved to: {path}")
+    },
+    error = function(e) {
+      grDevices::dev.off()
+      cli::cli_abort(paste0(
+        "An error occurred while saving the figure: ",
+        e$message
+      ))
+    }
+  )
+  invisible(path)
 }
-
