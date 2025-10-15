@@ -26,12 +26,13 @@
 #'                title = "Sample Figure", caption = "This is a sample caption.",
 #'                label = "sample_fig", copy_fig = TRUE)
 #' }
-ltx_build_fig <- function(fig_in = NULL,
-                          fig_out = NULL,
-                          title = NULL,
-                          caption = NULL,
-                          label = NULL,
-                          copy_fig = TRUE) {
+ltx_build_fig <- function(
+  fig_in = NULL,
+  fig_out = NULL,
+  title = NULL,
+  caption = NULL,
+  label = NULL
+) {
   # Check for fig_in
   if (is.null(fig_in)) {
     cli::cli_abort("fig_in must be supplied. Argument is NULL.")
@@ -42,12 +43,17 @@ ltx_build_fig <- function(fig_in = NULL,
 
   # Handle fig_out if NULL
   if (is.null(fig_out)) {
-    cli::cli_alert_info("`fig_out` is NULL, saving fig_out to same location as `fig_in`.")
+    cli::cli_alert_info(
+      "`fig_out` is NULL, saving fig_out to same location as `fig_in`."
+    )
     if (stringr::str_detect(fig_in, "fig_in")) {
       fig_out <- fs::path(
         fs::path_dir(fig_in),
-        stringr::str_replace(fs::path_ext_remove(fs::path_file(fig_in)),
-                             "fig_in", "fig_out"),
+        stringr::str_replace(
+          fs::path_ext_remove(fs::path_file(fig_in)),
+          "fig_in",
+          "fig_out"
+        ),
         ext = fs::path_ext(fig_in)
       )
     } else {
@@ -61,18 +67,22 @@ ltx_build_fig <- function(fig_in = NULL,
 
   # Handle missing title, caption, and label with defaults
   title <- title %||% "Example figure"
-  caption <- caption %||% "This figure shows nothing of importance, it is work under construction."
+  caption <- caption %||%
+    "This figure shows nothing of importance, it is work under construction."
   label <- label %||% "example"
 
   # Ensure the label is unique and properly formatted
   label <- paste0("fig:", label)
 
   # Read the figure content from fig_in
-  fig_body <- tryCatch({
-    readLines(fig_in)
-  }, error = function(e) {
-    cli::cli_abort("Error reading fig_in: {e$message}")
-  })
+  fig_body <- tryCatch(
+    {
+      readLines(fig_in)
+    },
+    error = function(e) {
+      cli::cli_abort("Error reading fig_in: {e$message}")
+    }
+  )
 
   # Build LaTeX figure environment components
   fig_start <- c("\\begin{figure}[htbp!]", "    \\centering")
@@ -84,23 +94,16 @@ ltx_build_fig <- function(fig_in = NULL,
   # Assemble complete figure environment
   figure <- c(fig_start, fig_title, fig_caption, fig_label, fig_body, fig_end)
 
-  # Copy figure to clipboard if needed
-  if (copy_fig) {
-    tryCatch({
-      utils::writeClipboard(figure)
-      cli::cli_alert_success("Figure copied to clipboard.")
-    }, error = function(e) {
-      cli::cli_alert_warning("Failed to copy to clipboard: {e$message}")
-    })
-  }
-
   # Write the figure to fig_out using the write_tex function
-  tryCatch({
-    write_tex(x = figure, path = fig_out, verbose = FALSE)
-    cli::cli_alert_success("Figure is saved to: {fig_out}")
-  }, error = function(e) {
-    cli::cli_abort("Error writing figure to file: {e$message}")
-  })
+  tryCatch(
+    {
+      write_tex(x = figure, path = fig_out, verbose = FALSE)
+      cli::cli_alert_success("Figure is saved to: {fig_out}")
+    },
+    error = function(e) {
+      cli::cli_abort("Error writing figure to file: {e$message}")
+    }
+  )
 
   invisible(figure)
 }

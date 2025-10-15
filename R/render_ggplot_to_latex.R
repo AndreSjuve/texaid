@@ -68,6 +68,30 @@ render_ggplot_to_latex <- function(
     }
   )
 
+  # Handle fig_out if NULL
+  if (is.null(fig_out)) {
+    cli::cli_alert_info(
+      "`fig_out` is NULL, saving fig_out to same location as `fig_path`."
+    )
+    if (stringr::str_detect(fig_path, "fig_in")) {
+      fig_out <- fs::path(
+        fs::path_dir(fig_path),
+        stringr::str_replace(
+          fs::path_ext_remove(fs::path_file(fig_path)),
+          "fig_in",
+          "fig_out"
+        ),
+        ext = fs::path_ext(fig_path)
+      )
+    } else {
+      fig_out <- fs::path(
+        fs::path_dir(fig_path),
+        paste0("fig_out_", fs::path_ext_remove(fs::path_file(fig_path))),
+        ext = fs::path_ext(fig_path)
+      )
+    }
+  }
+
   # Attempt to build the LaTeX figure environment
   tryCatch(
     {
@@ -76,8 +100,7 @@ render_ggplot_to_latex <- function(
         fig_out = fig_out,
         title = title,
         caption = caption,
-        label = label,
-        copy_fig = copy_fig
+        label = label
       )
     },
     error = function(e) {
@@ -86,9 +109,22 @@ render_ggplot_to_latex <- function(
   )
 
   # Collect and inject metadata
-  meta <- collect_output_metadata(output_path = fig_path)
-  write_metadata_block(fig_path, meta, mode = "auto")
+  meta <- collect_output_metadata(output_path = fig_out)
+  write_metadata_block(fig_out, meta, mode = "auto")
 
+  figure <- readLines(fig_out)
+
+  if (copy_fig) {
+    tryCatch(
+      {
+        utils::writeClipboard(figure)
+        cli::cli_alert_success("Figure copied to clipboard.")
+      },
+      error = function(e) {
+        cli::cli_alert_warning("Failed to copy to clipboard: {e$message}")
+      }
+    )
+  }
   # Return the original ggplot object
   invisible(fig)
 }
