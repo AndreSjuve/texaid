@@ -40,16 +40,18 @@
 #' @import cli
 #' @export
 
-kable_wrapper <- function(tbl = NULL,
-                          title,
-                          lbl,
-                          print_tbl = FALSE,
-                          col_spec = NULL,
-                          use_X_col = TRUE,
-                          X_col_place = 1,
-                          col_type = "c",
-                          verbose = TRUE) {
-
+kable_wrapper <- function(
+  tbl = NULL,
+  title,
+  lbl,
+  col_names = NULL,
+  print_tbl = FALSE,
+  col_spec = NULL,
+  use_X_col = TRUE,
+  X_col_place = 1,
+  col_type = "c",
+  verbose = TRUE
+) {
   if (is.null(tbl)) {
     cli::cli_abort("No table given")
   } else {
@@ -60,50 +62,70 @@ kable_wrapper <- function(tbl = NULL,
 
   # Validate column type
   if (!col_type %in% c("l", "c", "r")) {
-    if (verbose) {  # Check if verbose is TRUE
+    if (verbose) {
+      # Check if verbose is TRUE
       cli::cli_alert_warning("col_type not l, c or r, defaulting to c")
     }
     col_type <- "c"
   }
 
   if (is.null(col_spec)) {
-    if (verbose) {  # Check if verbose is TRUE
+    if (verbose) {
+      # Check if verbose is TRUE
       cli::cli_alert_info("No column specification given")
     }
     if (use_X_col) {
-      if (verbose) {  # Check if verbose is TRUE
-        cli::cli_alert_info("Table will use X column type for tabularx environment")
+      if (verbose) {
+        # Check if verbose is TRUE
+        cli::cli_alert_info(
+          "Table will use X column type for tabularx environment"
+        )
       }
       if (X_col_place == 1) {
         col_spec <- c("X", rep(col_type, n_cols - 1))
       } else {
-        col_spec <- c(rep(col_type, X_col_place - 1), "X", rep(col_type, n_cols - X_col_place))
+        col_spec <- c(
+          rep(col_type, X_col_place - 1),
+          "X",
+          rep(col_type, n_cols - X_col_place)
+        )
       }
     } else {
-      if (verbose) {  # Check if verbose is TRUE
+      if (verbose) {
+        # Check if verbose is TRUE
         cli::cli_alert_info("Table will not use X column type")
       }
       col_spec <- c("l", rep(col_type, n_cols - 1))
     }
   }
 
+  if (is.null(col_names)) {
+    cli::cli_alert_info(
+      "Argument {.arg col_names} is NULL, defaulting to tibble column names."
+    )
+    col_names <- colnames(tbl)
+  }
+
   if (length(col_spec) != n_cols) {
-    cli::cli_abort("Length of column specification does not match the number of columns in the tbl data frame")
+    cli::cli_abort(
+      "Length of column specification does not match the number of columns in the tbl data frame"
+    )
   }
 
   out_tbl <- kableExtra::kable(
-    x           = tbl,
-    format      = "latex",
-    caption     = title,
-    label       = lbl,
-    align       = col_spec,
-    tabular     = "tabularx",
-    booktabs    = TRUE,
-    row.names   = FALSE,
-    escape      = FALSE,
+    x = tbl,
+    format = "latex",
+    caption = title,
+    label = lbl,
+    align = col_spec,
+    col.names = col_names,
+    tabular = "tabularx",
+    booktabs = TRUE,
+    row.names = FALSE,
+    escape = FALSE,
     format.args = list(big.mark = ","),
-    digits      = 2,
-    linesep     = ""
+    digits = 2,
+    linesep = ""
   )
 
   ltx_print_tbl(out_tbl, print = print_tbl)

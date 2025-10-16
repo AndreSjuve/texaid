@@ -46,16 +46,19 @@
 #' }
 #'
 #' @export
-ltx_tidy_table <- function(x,
-                           tbl_note = "",
-                           replace_idx = 1,
-                           array_stretch = 1.2,
-                           threshold = 10,
-                           big_dec = 0,
-                           small_dec = 2,
-                           ruler_based = TRUE,
-                           print_tbl = TRUE) {
-
+ltx_tidy_table <- function(
+  x,
+  tbl_path = NULL,
+  tbl_note = "",
+  replace_idx = 1,
+  array_stretch = 1.2,
+  threshold = 10,
+  big_dec = 0,
+  small_dec = 2,
+  numbers_math_mode = FALSE,
+  ruler_based = TRUE,
+  print_tbl = TRUE
+) {
   # Ensure x is valid LaTeX table input
   if (is.null(x) || length(x) == 0) {
     cli::cli_abort("The LaTeX table input cannot be null or empty.")
@@ -66,13 +69,30 @@ ltx_tidy_table <- function(x,
     ltx_capture_output(x) |>
     ltx_placement(replace_idx = replace_idx) |>
     ltx_stretch(array_stretch = array_stretch) |>
-    ltx_round_numbers(threshold = threshold,
-                      big_dec = big_dec,
-                      small_dec = small_dec) |>
-    ltx_caption(tbl_note = tbl_note) |>
-    ltx_wrap_table_math(ruler_based = ruler_based)
+    ltx_caption(tbl_note = tbl_note)
 
-  ltx_print_tbl(processed_table, print = print_tbl)
+  if (numbers_math_mode) {
+    processed_table <-
+      processed_table |>
+      ltx_round_numbers(
+        threshold = threshold,
+        big_dec = big_dec,
+        small_dec = small_dec
+      ) |>
+      ltx_wrap_table_math(ruler_based = ruler_based)
+  }
 
+  if (is.null(tbl_path)) {
+    cli::cli_alert_danger(
+      "Argument {.arg tbl_path} is empty. Cannot save table and print with metadata"
+    )
+    ltx_print_tbl(processed_table, print = print_tbl)
+  } else {
+    ltx_save_table(
+      x = processed_table,
+      tbl_path = tbl_path,
+      print_tbl = print_tbl
+    )
+  }
   invisible(processed_table)
 }
