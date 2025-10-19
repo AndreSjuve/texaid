@@ -62,7 +62,7 @@
 ltx_environment <- function(
   x,
   env = "tabularx",
-  width = "\\textwidth",
+  width = "\\\\textwidth",
   print_tbl = FALSE
 ) {
   # Ensure character vector
