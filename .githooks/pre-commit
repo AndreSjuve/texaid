@@ -1,0 +1,45 @@
+#!/bin/sh
+# Refuse to commit anything reached through a junction.
+#
+# _cold/ is a window onto <OneDrive>\awsjuve\<this repo's path>. What sits behind
+# it must never enter git: student personal data, third-party readings, large
+# media. .gitignore already excludes _cold/, but `git add -f` defeats .gitignore
+# and this hook does not.
+#
+# The check is on the reparse point rather than on the name, so a junction added
+# later under any name is caught too. Git Bash reports a junction as a symlink,
+# which is why -L is enough.
+#
+# Installed by bootstrap.ps1 setting core.hooksPath=.githooks. It lives in the
+# repo rather than in machine-setup so that it arrives with a clone, on a machine
+# where machine-setup may not be checked out yet.
+
+blocked=$(
+  git diff --cached --name-only --diff-filter=ACMR | while IFS= read -r path; do
+    dir=${path%/*}
+    [ "$dir" = "$path" ] && continue      # file at repo root, no ancestors
+    while [ -n "$dir" ] && [ "$dir" != "." ] && [ "$dir" != "/" ]; do
+      if [ -L "$dir" ]; then
+        printf '%s\n' "$path"
+        break
+      fi
+      case "$dir" in */*) dir=${dir%/*} ;; *) dir="." ;; esac
+    done
+  done
+)
+
+if [ -n "$blocked" ]; then
+  echo "pre-commit: refusing paths that resolve outside the repository." >&2
+  echo "" >&2
+  # Quoted, and indented with sed rather than by printf's format reuse: an
+  # unquoted $blocked word-splits, so a path with spaces in it is reported as
+  # one line per word. Every filename in this repo has spaces.
+  printf '%s\n' "$blocked" | sed 's/^/  /' >&2
+  echo "" >&2
+  echo "These are reached through a junction. See '_cold' in README.md." >&2
+  echo "Do not pass --no-verify: the material behind _cold is excluded for" >&2
+  echo "legal or licensing reasons, not for tidiness." >&2
+  exit 1
+fi
+
+exit 0
